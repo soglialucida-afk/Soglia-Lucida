@@ -118,7 +118,7 @@ function SongCard({ song, index }) {
             color: song.accent,
             marginBottom: 18,
           }}
-          animate={{ opacity: hovered ? 1 : 0.45 }}
+          animate={{ opacity: hovered ? 1 : 0.65 }}
           transition={{ duration: 0.3 }}
         >
           {song.number} &mdash; {song.year}
@@ -148,7 +148,7 @@ function SongCard({ song, index }) {
                 fontWeight: 300,
                 fontSize: 'clamp(0.88rem, 1.8vw, 1rem)',
                 lineHeight: 1.9,
-                color: 'rgba(255,255,255,0.25)',
+                color: 'rgba(255,255,255,0.45)',
                 whiteSpace: 'pre-line',
               }}
             >
@@ -269,7 +269,7 @@ export default function App() {
               fontSize: '0.65rem',
               letterSpacing: '5px',
               textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.22)',
+              color: 'rgba(255,255,255,0.40)',
               fontWeight: 200,
             }}
           >
