@@ -21,7 +21,7 @@ const SONGS = [
     accent: '#4cc9f0',
     accentRgb: '76,201,240',
     excerpt: '"Can we believe in people?\nLet the love show —\nflowers bud without a doubt."',
-    href: '/Believe_in_People_complete/index.html',
+    href: '/Believe_in_People/index.html',
   },
 ]
 
