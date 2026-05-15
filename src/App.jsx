@@ -148,7 +148,7 @@ function SongCard({ song, index }) {
                 fontWeight: 300,
                 fontSize: 'clamp(0.88rem, 1.8vw, 1rem)',
                 lineHeight: 1.9,
-                color: 'rgba(255,255,255,0.45)',
+                color: 'rgba(255,255,255,0.65)',
                 whiteSpace: 'pre-line',
               }}
             >
@@ -269,7 +269,7 @@ export default function App() {
               fontSize: '0.65rem',
               letterSpacing: '5px',
               textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.40)',
+              color: 'rgba(255,255,255,0.55)',
               fontWeight: 200,
             }}
           >
@@ -309,7 +309,7 @@ export default function App() {
             fontSize: '0.58rem',
             letterSpacing: '3px',
             textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.1)',
+            color: 'rgba(255,255,255,0.3)',
             fontWeight: 200,
           }}
         >
