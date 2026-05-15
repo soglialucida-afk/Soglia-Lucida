@@ -111,7 +111,7 @@ function SongCard({ song, index }) {
       <div style={{ padding: '52px 60px 52px 64px', position: 'relative' }}>
         <motion.div
           style={{
-            fontSize: '0.58rem',
+            fontSize: '0.72rem',
             letterSpacing: '5px',
             textTransform: 'uppercase',
             fontWeight: 300,
@@ -146,9 +146,9 @@ function SongCard({ song, index }) {
                 fontFamily: "'Cormorant Garamond', serif",
                 fontStyle: 'italic',
                 fontWeight: 300,
-                fontSize: 'clamp(0.88rem, 1.8vw, 1rem)',
+                fontSize: 'clamp(1rem, 2vw, 1.15rem)',
                 lineHeight: 1.9,
-                color: 'rgba(255,255,255,0.65)',
+                color: 'rgba(255,255,255,0.75)',
                 whiteSpace: 'pre-line',
               }}
             >
@@ -306,10 +306,10 @@ export default function App() {
           style={{
             marginTop: 64,
             textAlign: 'center',
-            fontSize: '0.58rem',
+            fontSize: '0.72rem',
             letterSpacing: '3px',
             textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.3)',
+            color: 'rgba(255,255,255,0.5)',
             fontWeight: 200,
           }}
         >
