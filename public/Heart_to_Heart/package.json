@@ -1,0 +1,12 @@
+{
+  "name": "heart-to-heart-recorder",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "record": "node record_video.mjs"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "playwright": "^1.44.0"
+  }
+}

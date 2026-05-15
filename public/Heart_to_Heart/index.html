@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Heart to Heart — Soglia Lucida</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Outfit:wght@200;300&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Outfit',sans-serif;-webkit-tap-highlight-color:transparent}
+
+.cinema{position:fixed;inset:0;background:#000}
+
+/* Video background */
+.bg-video{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  filter:brightness(0.38) contrast(1.15) saturate(0.85);
+  z-index:1;
+}
+
+.vignette{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at center,transparent 28%,rgba(0,0,0,0.88) 100%)}
+.grain{position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0.07;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E")}
+
+/* Top accent line */
+.top-line{
+  position:absolute;top:0;left:0;right:0;height:2px;z-index:20;
+  background:linear-gradient(90deg,transparent,#f72585,transparent);
+  pointer-events:none;
+}
+
+/* Back button */
+.back-btn{
+  position:absolute;top:22px;left:24px;z-index:25;
+  font-size:0.6rem;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(255,255,255,0.25);font-family:'Outfit',sans-serif;font-weight:200;
+  text-decoration:none;transition:color 0.3s;padding:6px 0;
+}
+.back-btn:hover{color:rgba(255,255,255,0.65)}
+
+/* YouTube button */
+.yt-btn{
+  position:absolute;top:18px;right:24px;z-index:25;
+  display:flex;align-items:center;gap:8px;
+  text-decoration:none;color:rgba(255,255,255,0.22);
+  font-family:'Outfit',sans-serif;font-size:0.58rem;
+  font-weight:200;letter-spacing:3px;text-transform:uppercase;
+  transition:color 0.35s;
+}
+.yt-btn:hover{color:#ff9ece}
+.yt-icon{
+  width:28px;height:28px;border-radius:50%;
+  border:1px solid rgba(255,255,255,0.12);
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.05);
+  transition:border-color 0.35s,background 0.35s;flex-shrink:0;
+}
+.yt-btn:hover .yt-icon{border-color:rgba(247,37,133,0.5);background:rgba(247,37,133,0.1)}
+.yt-icon svg{width:11px;height:11px;fill:currentColor;margin-left:1px}
+.yt-label{display:none}
+@media(min-width:480px){.yt-label{display:block}}
+
+/* Mouse-following lyric */
+#mouseLyric{
+  position:fixed;z-index:8;pointer-events:none;text-align:center;
+  transform:translate(-50%,-50%);
+  transition:left 0.45s cubic-bezier(0.25,0.46,0.45,0.94),top 0.45s cubic-bezier(0.25,0.46,0.45,0.94),opacity 0.8s ease;
+  opacity:0;max-width:420px;will-change:left,top;
+}
+#mouseLyric .ml-text{
+  font-family:'Cormorant Garamond',serif;font-weight:300;
+  font-size:clamp(1rem,2.5vw,1.6rem);line-height:1.7;
+  color:rgba(255,245,230,0.88);
+  text-shadow:0 2px 20px rgba(0,0,0,0.95),0 0 40px rgba(0,0,0,0.8);
+}
+#mouseLyric.chorus .ml-text{
+  font-weight:400;font-style:italic;color:#ff9ece;
+  text-shadow:0 0 30px rgba(247,37,133,0.45),0 2px 20px rgba(0,0,0,0.95);
+}
+#mouseLyric.visible{opacity:1}
+
+.lyrics-container{
+  position:absolute;top:0;left:0;right:0;bottom:120px;
+  z-index:5;display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.lyric{
+  position:absolute;text-align:center;opacity:0;
+  transform:translateY(18px);
+  transition:opacity 0.9s ease,transform 0.9s ease;
+  max-width:85%;pointer-events:none;
+}
+.lyric.visible{opacity:1;transform:translateY(0)}
+.lyric-text{
+  font-family:'Cormorant Garamond',serif;font-weight:300;
+  font-size:clamp(1.5rem,5vw,2.6rem);line-height:1.7;color:#fff;
+  text-shadow:0 2px 20px rgba(0,0,0,0.85),0 0 60px rgba(0,0,0,0.5);
+}
+.lyric.chorus .lyric-text{
+  font-weight:400;font-style:italic;
+  font-size:clamp(1.7rem,5.5vw,3rem);color:#ff9ece;
+  text-shadow:0 0 50px rgba(247,37,133,0.4),0 2px 20px rgba(0,0,0,0.85);
+}
+.lyric.bridge .lyric-text{
+  font-weight:300;font-style:italic;
+  font-size:clamp(1.3rem,4.5vw,2.2rem);color:#d4c4e8;
+  text-shadow:0 0 40px rgba(160,130,200,0.35),0 2px 20px rgba(0,0,0,0.85);
+}
+
+.bottom-bar{
+  position:absolute;bottom:0;left:0;right:0;z-index:10;
+  padding:20px 24px calc(20px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(to top,rgba(0,0,0,0.92) 0%,rgba(0,0,0,0.4) 60%,transparent 100%);
+}
+.progress-wrap{width:100%;cursor:pointer;padding:12px 0}
+.progress-track{width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;position:relative}
+.progress-fill{height:100%;background:linear-gradient(90deg,#f72585,#ff9ece);border-radius:2px;width:0%;transition:width 0.15s linear}
+.progress-dot{
+  position:absolute;top:50%;right:0;width:12px;height:12px;border-radius:50%;
+  background:#ff9ece;transform:translate(50%,-50%) scale(0);transition:transform 0.2s;
+}
+.progress-wrap:hover .progress-dot,.progress-wrap:active .progress-dot{transform:translate(50%,-50%) scale(1)}
+.controls{display:flex;align-items:center;gap:16px;margin-top:10px}
+.play-btn{
+  width:48px;height:48px;border-radius:50%;flex-shrink:0;
+  background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);
+  border:1px solid rgba(247,37,133,0.2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:background 0.2s,border-color 0.2s;
+}
+.play-btn:hover{background:rgba(247,37,133,0.18);border-color:rgba(247,37,133,0.5)}
+.play-btn svg{width:18px;height:18px;fill:#fff;margin-left:2px}
+.play-btn.playing svg{margin-left:0}
+.meta{flex:1;min-width:0}
+.meta-title{font-family:'Cormorant Garamond',serif;font-size:1rem;color:#fff;opacity:0.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta-sub{font-size:0.7rem;font-weight:200;color:#ff9ece;opacity:0.55;margin-top:1px;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.time{font-size:0.7rem;font-weight:200;color:rgba(255,255,255,0.35);letter-spacing:1px;font-variant-numeric:tabular-nums;flex-shrink:0}
+
+.start-screen{
+  position:absolute;inset:0;z-index:20;
+  background:rgba(0,0,0,0.7);backdrop-filter:blur(14px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:opacity 0.6s ease;
+}
+.start-screen.hidden{opacity:0;pointer-events:none}
+.start-title{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(2.4rem,7vw,4.2rem);color:#f5f0e8;margin-bottom:8px;text-align:center;padding:0 20px}
+.start-author{font-size:0.72rem;letter-spacing:4px;text-transform:uppercase;color:#f72585;opacity:0.85;margin-bottom:48px}
+.start-play{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,#f72585,#ff9ece);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 70px rgba(247,37,133,0.45);transition:transform 0.3s,box-shadow 0.3s;
+}
+.start-play:hover{transform:scale(1.1);box-shadow:0 0 90px rgba(247,37,133,0.6)}
+.start-play svg{width:32px;height:32px;fill:#fff;margin-left:4px}
+.start-hint{margin-top:24px;font-size:0.68rem;font-weight:200;color:rgba(255,255,255,0.25);letter-spacing:2px}
+
+.title-overlay{
+  position:absolute;inset:0;z-index:6;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 1s ease;padding:0 20px;
+}
+.title-overlay.visible{opacity:1}
+.title-overlay .to-author{font-size:0.72rem;letter-spacing:4px;text-transform:uppercase;color:#f72585;opacity:0.9;margin-bottom:16px}
+.title-overlay .to-title{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(2.4rem,7vw,4rem);color:#f5f0e8;text-shadow:0 2px 30px rgba(0,0,0,0.85);text-align:center}
+.title-overlay .to-collection{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:0.95rem;color:#ff9ece;opacity:0.45;margin-top:12px}
+
+.particles{position:absolute;inset:0;z-index:4;pointer-events:none}
+.p{position:absolute;width:2px;height:2px;background:#f72585;border-radius:50%;opacity:0;animation:float 10s infinite ease-in-out}
+@keyframes float{0%,100%{opacity:0;transform:translateY(0)}50%{opacity:0.18;transform:translateY(-70px)}}
+
+@media(max-width:480px){
+  .lyrics-container{bottom:130px;padding:16px}
+  .lyric{max-width:90%}
+  .lyric-text{font-size:clamp(1.2rem,4.5vw,1.8rem);line-height:1.5}
+  .lyric.chorus .lyric-text{font-size:clamp(1.3rem,5vw,2rem)}
+  .bottom-bar{padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+  .controls{gap:12px}
+  #mouseLyric{display:none}
+}
+@media(max-height:600px){
+  .lyrics-container{bottom:100px}
+  .lyric-text{font-size:clamp(1rem,3.5vw,1.5rem)}
+}
+</style>
+</head>
+<body>
+<div class="cinema">
+  <video class="bg-video" autoplay muted loop playsinline poster="img1.jpg">
+    <source src="Heart_to_Heart_compressed.mp4" type="video/mp4">
+  </video>
+
+  <div class="top-line"></div>
+  <a href="javascript:history.back()" class="back-btn">← Soglia Lucida</a>
+  <a href="https://youtu.be/v95wcp9lUXk?si=G9UNZE5TEfuntIyk" target="_blank" rel="noopener" class="yt-btn">
+    <span class="yt-label">YouTube</span>
+    <span class="yt-icon"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span>
+  </a>
+
+  <div class="vignette"></div>
+  <div class="grain"></div>
+  <div class="particles" id="particles"></div>
+  <div class="lyrics-container" id="lyricsContainer"></div>
+  <div id="mouseLyric"><div class="ml-text"></div></div>
+
+  <div class="title-overlay" id="titleOverlay">
+    <div class="to-author">Soglia Lucida</div>
+    <div class="to-title">Heart to Heart</div>
+    <div class="to-collection">Razburkan horizont</div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+        <div class="progress-dot"></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="play-btn" id="playBtn">
+        <svg id="playIcon" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+      </button>
+      <div class="meta">
+        <div class="meta-title">Heart to Heart</div>
+        <div class="meta-sub">Soglia Lucida &middot; Razburkan horizont</div>
+      </div>
+      <div class="time"><span id="cur">0:00</span> / <span id="dur">0:00</span></div>
+    </div>
+  </div>
+
+  <div class="start-screen" id="startScreen">
+    <div class="start-author">Soglia Lucida</div>
+    <div class="start-title">Heart to Heart</div>
+    <div class="start-play"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></div>
+    <div class="start-hint">tap to play</div>
+  </div>
+</div>
+
+<audio id="audio" preload="auto"><source src="Heart_to_Heart.mp3" type="audio/mpeg"></audio>
+
+<script>
+const timeline = [
+  // Verse 1
+  [1,   4,   "There is no bridge in the world",        false],
+  [4,   6,   "Built heart to heart",                   false],
+  [6,   9,   "No more costly artwork",                 false],
+  [9,   13,  "Made by two souls apart",                false],
+  [13,  18,  "There's no tougher bond, no way",        false],
+  [18,  20,  "Love forged strong and true",            false],
+  [20,  24,  "Between people day to day",              false],
+  [24,  27,  "It's me and it's you",                   false],
+  // Chorus 1
+  [27,  31,  "Heart to heart we build",                true],
+  [31,  34,  "A love that's strong and real",          true],
+  [34,  37,  "Our bond is our art",                    true],
+  [37,  42,  "In all the love we feel",                true],
+  [42,  44,  "No paint can match our hues",            true],
+  [44,  48,  "No sculptures line so true",             true],
+  [48,  52,  "Crafted by our hearts' fuse",            true],
+  [52,  55,  "Me and you",                             true],
+  // Chorus 2
+  [55,  58,  "Heart to heart we build",                true],
+  [58,  61,  "A love that's strong and real",          true],
+  [61,  65,  "Our bond is our art",                    true],
+  [65,  68,  "In all the love we feel",                true],
+  [68,  71,  "No paint can match our hues",            true],
+  [71,  74,  "No sculptures line so true",             true],
+  [74,  77,  "Crafted by our hearts' fuse",            true],
+  [77,  80,  "Me and you",                             true],
+  // Chorus 3
+  [80,  85,  "Heart to heart we build",                true],
+  [85,  87,  "A love that's strong and real",          true],
+  [87,  91,  "Our bond is our art",                    true],
+  [91,  94,  "In all the love we feel",                true],
+  // Bridge
+  [94,  97,  "Bridges made of gold, they fade",        false],
+  [97,  101, "Ours stands firm and grand",             false],
+  [101, 106, "Our connection will not trade",          false],
+  [106, 108, "Hand in hand",                           false],
+  // Instrumental
+  [108, 120, "",                                       false],
+  // Final chorus
+  [120, 123, "Heart to heart we build",                true],
+  [123, 126, "A love that's strong and real",          true],
+  [126, 129, "Our bond is our art",                    true],
+  [129, 134, "In all the love we feel",                true],
+  // Outro
+  [134, 160, "",                                       false],
+];
+
+const container = document.getElementById('lyricsContainer');
+const lyricEls = timeline.map((t) => {
+  const div = document.createElement('div');
+  div.className = 'lyric' + (t[3] ? ' chorus' : '');
+  div.innerHTML = `<div class="lyric-text">${t[2].replace(/\n/g,'<br>')}</div>`;
+  container.appendChild(div);
+  return div;
+});
+
+const pEl = document.getElementById('particles');
+for (let i = 0; i < 20; i++) {
+  const p = document.createElement('div');
+  p.className = 'p';
+  p.style.left = Math.random()*100+'%';
+  p.style.top = (20+Math.random()*60)+'%';
+  p.style.animationDelay = Math.random()*10+'s';
+  p.style.animationDuration = (8+Math.random()*8)+'s';
+  pEl.appendChild(p);
+}
+
+const audio = document.getElementById('audio');
+const playBtn = document.getElementById('playBtn');
+const playIcon = document.getElementById('playIcon');
+const progressFill = document.getElementById('progressFill');
+const progressWrap = document.getElementById('progressWrap');
+const curEl = document.getElementById('cur');
+const durEl = document.getElementById('dur');
+const startScreen = document.getElementById('startScreen');
+const titleOverlay = document.getElementById('titleOverlay');
+const mouseLyric = document.getElementById('mouseLyric');
+
+let playing = false;
+let mouseActive = false;
+let mouseHideTimer = null;
+let mouseX = window.innerWidth/2;
+let mouseY = window.innerHeight/2;
+let targetX = mouseX, targetY = mouseY;
+let currentLyricText = '';
+let currentIsChorus = false;
+
+const playSVG = '<polygon points="6,3 20,12 6,21"/>';
+const pauseSVG = '<rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/>';
+
+function togglePlay() {
+  if (playing) { audio.pause(); playIcon.innerHTML = playSVG; playBtn.classList.remove('playing'); }
+  else { audio.play(); playIcon.innerHTML = pauseSVG; playBtn.classList.add('playing'); }
+  playing = !playing;
+}
+
+startScreen.addEventListener('click', () => { startScreen.classList.add('hidden'); togglePlay(); });
+playBtn.addEventListener('click', togglePlay);
+audio.addEventListener('loadedmetadata', () => { durEl.textContent = fmt(audio.duration); });
+audio.addEventListener('ended', () => { playing = false; playIcon.innerHTML = playSVG; playBtn.classList.remove('playing'); });
+
+audio.addEventListener('timeupdate', () => {
+  const t = audio.currentTime;
+  progressFill.style.width = (t/audio.duration*100)+'%';
+  curEl.textContent = fmt(t);
+
+  titleOverlay.classList.remove('visible');
+
+  lyricEls.forEach((el, i) => {
+    const active = t >= timeline[i][0] && t < timeline[i][1];
+    if (active) {
+      currentLyricText = timeline[i][2];
+      currentIsChorus = timeline[i][3];
+      if (mouseActive) updateMouseLyric(true);
+    }
+    mouseActive ? el.classList.remove('visible') : (active ? el.classList.add('visible') : el.classList.remove('visible'));
+  });
+
+  const hasActive = timeline.some((t2, i) => t >= t2[0] && t < t2[1] && t2[2]);
+  if (!hasActive) { currentLyricText = ''; if (mouseActive) updateMouseLyric(false); }
+});
+
+function updateMouseLyric(show) {
+  const ml = mouseLyric.querySelector('.ml-text');
+  ml.innerHTML = currentLyricText.replace(/\n/g,'<br>');
+  mouseLyric.className = currentIsChorus ? 'chorus' : '';
+  show && currentLyricText ? mouseLyric.classList.add('visible') : mouseLyric.classList.remove('visible');
+}
+
+document.addEventListener('mousemove', (e) => {
+  targetX = e.clientX; targetY = e.clientY;
+  if (!mouseActive) { mouseActive = true; lyricEls.forEach(el => el.classList.remove('visible')); }
+  clearTimeout(mouseHideTimer);
+  mouseHideTimer = setTimeout(() => { mouseActive = false; mouseLyric.classList.remove('visible'); }, 3000);
+});
+
+function animateMouse() {
+  mouseX += (targetX-mouseX)*0.08;
+  mouseY += (targetY-mouseY)*0.08;
+  mouseLyric.style.left = mouseX+'px';
+  mouseLyric.style.top = (mouseY-40)+'px';
+  requestAnimationFrame(animateMouse);
+}
+animateMouse();
+
+function seekFromEvent(e) {
+  const r = progressWrap.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  audio.currentTime = Math.max(0,Math.min(1,(clientX-r.left)/r.width))*audio.duration;
+}
+progressWrap.addEventListener('click', seekFromEvent);
+progressWrap.addEventListener('touchstart', (e) => { e.preventDefault(); seekFromEvent(e); },{passive:false});
+progressWrap.addEventListener('touchmove', (e) => { e.preventDefault(); seekFromEvent(e); },{passive:false});
+
+function fmt(s) { const m=Math.floor(s/60),sec=Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
+</script>
+</body>
+</html>
